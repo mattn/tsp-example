@@ -51,4 +51,4 @@ require (
 	modernc.org/sqlite v1.36.0 // indirect
 )
 
-replace github.com/mattn/tsp-example/api => ../api
+//replace github.com/mattn/tsp-example/api => ../api
