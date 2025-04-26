@@ -125,6 +125,41 @@ func (s *Error) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes bool as json.
+func (o OptBool) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Bool(bool(o.Value))
+}
+
+// Decode decodes bool from json.
+func (o *OptBool) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBool to nil")
+	}
+	o.Set = true
+	v, err := d.Bool()
+	if err != nil {
+		return err
+	}
+	o.Value = bool(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBool) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBool) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int32 as json.
 func (o OptInt32) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -212,11 +247,16 @@ func (s *Todo) encodeFields(e *jx.Encoder) {
 		e.FieldStart("content")
 		e.Str(s.Content)
 	}
+	{
+		e.FieldStart("done")
+		e.Bool(s.Done)
+	}
 }
 
-var jsonFieldsNameOfTodo = [2]string{
+var jsonFieldsNameOfTodo = [3]string{
 	0: "id",
 	1: "content",
+	2: "done",
 }
 
 // Decode decodes Todo from json.
@@ -252,6 +292,18 @@ func (s *Todo) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"content\"")
 			}
+		case "done":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Bool()
+				s.Done = bool(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"done\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -262,7 +314,7 @@ func (s *Todo) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -435,11 +487,18 @@ func (s *TodoUpdate) encodeFields(e *jx.Encoder) {
 			s.Content.Encode(e)
 		}
 	}
+	{
+		if s.Done.Set {
+			e.FieldStart("done")
+			s.Done.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfTodoUpdate = [2]string{
+var jsonFieldsNameOfTodoUpdate = [3]string{
 	0: "id",
 	1: "content",
+	2: "done",
 }
 
 // Decode decodes TodoUpdate from json.
@@ -469,6 +528,16 @@ func (s *TodoUpdate) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"content\"")
+			}
+		case "done":
+			if err := func() error {
+				s.Done.Reset()
+				if err := s.Done.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"done\"")
 			}
 		default:
 			return d.Skip()

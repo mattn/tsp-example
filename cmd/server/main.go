@@ -65,7 +65,7 @@ func (h *TodoHandler) TodosList(ctx context.Context) (r *api.TodoList, _ error) 
 // GET /widgets/{id}
 func (h *TodoHandler) TodosRead(ctx context.Context, params api.TodosReadParams) (r *api.Todo, _ error) {
 	var todo api.Todo
-	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Scan(ctx, &todo)
+	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Where("id = ?", params.ID).Scan(ctx, &todo)
 	if err != nil {
 		return nil, err
 	}
@@ -78,16 +78,23 @@ func (h *TodoHandler) TodosRead(ctx context.Context, params api.TodosReadParams)
 //
 // PATCH /widgets/{id}
 func (h *TodoHandler) TodosUpdate(ctx context.Context, req *api.TodoUpdate, params api.TodosUpdateParams) (r *api.Todo, _ error) {
-	result, err := h.bundb.NewUpdate().Model(req).Where("id = ?", params.ID).Exec(context.Background())
+	var todo api.Todo
+	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Where("id = ?", params.ID).Scan(ctx, &todo)
+	if err != nil {
+		return nil, err
+	}
+	if req.Content.IsSet() {
+		todo.SetContent(req.Content.Value)
+	}
+	if req.Done.IsSet() {
+		todo.SetDone(req.Done.Value)
+	}
+	result, err := h.bundb.NewUpdate().Model(&todo).Where("id = ?", params.ID).Exec(context.Background())
 	if err != nil {
 		return nil, err
 	}
 	if num, err := result.RowsAffected(); err != nil || num == 0 {
 		return nil, errors.New("No records updated")
-	}
-	todo := api.Todo{
-		ID:      req.ID.Value,
-		Content: req.Content.Value,
 	}
 	return &todo, nil
 }

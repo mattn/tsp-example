@@ -62,6 +62,52 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 	s.Response = val
 }
 
+// NewOptBool returns new OptBool with value set to v.
+func NewOptBool(v bool) OptBool {
+	return OptBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBool is optional bool.
+type OptBool struct {
+	Value bool
+	Set   bool
+}
+
+// IsSet returns true if OptBool was set.
+func (o OptBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBool) SetTo(v bool) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBool) Get() (v bool, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptInt32 returns new OptInt32 with value set to v.
 func NewOptInt32(v int32) OptInt32 {
 	return OptInt32{
@@ -161,6 +207,8 @@ type Todo struct {
 	ID int32 `json:"id" bun:"id,pk,autoincrement"`
 	// Content text.
 	Content string `json:"content"`
+	// Represent done the todo.
+	Done bool `json:"done"`
 }
 
 // GetID returns the value of ID.
@@ -173,6 +221,11 @@ func (s *Todo) GetContent() string {
 	return s.Content
 }
 
+// GetDone returns the value of Done.
+func (s *Todo) GetDone() bool {
+	return s.Done
+}
+
 // SetID sets the value of ID.
 func (s *Todo) SetID(val int32) {
 	s.ID = val
@@ -181,6 +234,11 @@ func (s *Todo) SetID(val int32) {
 // SetContent sets the value of Content.
 func (s *Todo) SetContent(val string) {
 	s.Content = val
+}
+
+// SetDone sets the value of Done.
+func (s *Todo) SetDone(val bool) {
+	s.Done = val
 }
 
 // Represent a list of Todo items.
@@ -207,6 +265,8 @@ type TodoUpdate struct {
 	ID OptInt32 `json:"id" bun:"id,pk,autoincrement"`
 	// Content text.
 	Content OptString `json:"content"`
+	// Represent done the todo.
+	Done OptBool `json:"done"`
 }
 
 // GetID returns the value of ID.
@@ -219,6 +279,11 @@ func (s *TodoUpdate) GetContent() OptString {
 	return s.Content
 }
 
+// GetDone returns the value of Done.
+func (s *TodoUpdate) GetDone() OptBool {
+	return s.Done
+}
+
 // SetID sets the value of ID.
 func (s *TodoUpdate) SetID(val OptInt32) {
 	s.ID = val
@@ -227,6 +292,11 @@ func (s *TodoUpdate) SetID(val OptInt32) {
 // SetContent sets the value of Content.
 func (s *TodoUpdate) SetContent(val OptString) {
 	s.Content = val
+}
+
+// SetDone sets the value of Done.
+func (s *TodoUpdate) SetDone(val OptBool) {
+	s.Done = val
 }
 
 // TodosDeleteNoContent is response for TodosDelete operation.

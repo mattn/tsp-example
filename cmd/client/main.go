@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -27,8 +28,11 @@ func main() {
 			&cli.Command{
 				Name: "new",
 				Action: func(ctx context.Context, c *cli.Command) error {
+					if c.Args().Present() {
+						return errors.New("expected exactly an argument")
+					}
 					_, err := client.TodosCreate(ctx, &api.Todo{
-						Content: c.Args().First(),
+						Content: c.Args().Get(0),
 					})
 					return err
 				},
@@ -37,8 +41,36 @@ func main() {
 				Name: "delete",
 				Action: func(ctx context.Context, c *cli.Command) error {
 					return client.TodosDelete(ctx, api.TodosDeleteParams{
-						ID: c.Args().First(),
+						ID: c.Args().Get(0),
 					})
+				},
+			},
+			&cli.Command{
+				Name: "update",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					if c.Args().Len() != 2 {
+						return errors.New("expected exactly two arguments")
+					}
+					_, err = client.TodosUpdate(ctx, &api.TodoUpdate{
+						Content: api.NewOptString(c.Args().Get(1)),
+					}, api.TodosUpdateParams{
+						ID: c.Args().Get(0),
+					})
+					return err
+				},
+			},
+			&cli.Command{
+				Name: "done",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					if c.Args().Present() {
+						return errors.New("expected exactly an argument")
+					}
+					_, err = client.TodosUpdate(ctx, &api.TodoUpdate{
+						Done: api.NewOptBool(true),
+					}, api.TodosUpdateParams{
+						ID: c.Args().Get(0),
+					})
+					return err
 				},
 			},
 			&cli.Command{
@@ -57,7 +89,7 @@ func main() {
 						return json.NewEncoder(os.Stdout).Encode(items.Items)
 					}
 					for _, item := range items.Items {
-						fmt.Println(item.GetID(), item.GetContent())
+						fmt.Println(item.GetID(), item.GetContent(), item.GetDone())
 					}
 					return err
 				},

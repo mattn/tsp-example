@@ -6,7 +6,7 @@ using Http;
 namespace TodoService;
 
 @doc("Represent a Todo item")
-@example(#{ content: "Hello, World", id: 2 })
+@example(#{ content: "Hello, World", id: 2, done: false })
 model Todo {
     @TypeSpec.OpenAPI.extension(
         "x-oapi-codegen-extra-tags",
@@ -16,9 +16,12 @@ model Todo {
     id: int32;
 
     @doc("Content text")
-    @minLength(1)
-    @maxLength(32)
+    //@minLength(1)
+    //@maxLength(32)
     content: string;
+
+    @doc("Represent done the todo")
+    done: boolean;
 }
 
 @doc("Represent a list of Todo items")
