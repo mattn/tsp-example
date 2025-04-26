@@ -8,8 +8,8 @@ dist/
 # Dependency directories
 node_modules/
 
-server
-server.exe
-client
-client.exe
+./server
+./server.exe
+./client
+./client.exe
 todo.sqlite
