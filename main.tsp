@@ -6,6 +6,7 @@ using Http;
 namespace TodoService;
 
 @doc("Represent a Todo item")
+@summary("Represent a Todo item")
 @example(#{ content: "Hello, World", id: 2, done: false })
 model Todo {
     @TypeSpec.OpenAPI.extension(
@@ -25,11 +26,14 @@ model Todo {
 }
 
 @doc("Represent a list of Todo items")
+@summary("Represent a list of Todo items")
 model TodoList {
     @doc("Todo items")
     items: Todo[];
 }
 
+@doc("Represent errors")
+@example(#{ code: 123, message: "example error" })
 @error
 model Error {
     code: int32;

@@ -10,6 +10,7 @@ func (s *ErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
+// Represent errors.
 // Ref: #/components/schemas/Error
 type Error struct {
 	Code    int32  `json:"code"`
