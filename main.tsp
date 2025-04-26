@@ -5,14 +5,18 @@ using Http;
 @service(#{ title: "Todo Service" })
 namespace TodoService;
 
+@doc("Represent a Todo item")
 model Todo {
   @TypeSpec.OpenAPI.extension("x-oapi-codegen-extra-tags", #{
     bun: "id,pk,autoincrement"
   })
   id: int32;
+  @minLength(1)
+  @maxLength(10)
   content: string;
 }
 
+@doc("Represent a list of Todo items")
 model TodoList {
   items: Todo[];
 }

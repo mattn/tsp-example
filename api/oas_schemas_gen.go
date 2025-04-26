@@ -180,6 +180,7 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// Represent a Todo item.
 // Ref: #/components/schemas/Todo
 type Todo struct {
 	ID      int32  `json:"id" bun:"id,pk,autoincrement"`
@@ -206,6 +207,7 @@ func (s *Todo) SetContent(val string) {
 	s.Content = val
 }
 
+// Represent a list of Todo items.
 // Ref: #/components/schemas/TodoList
 type TodoList struct {
 	Items []Todo `json:"items"`
@@ -221,6 +223,7 @@ func (s *TodoList) SetItems(val []Todo) {
 	s.Items = val
 }
 
+// Represent a Todo item.
 // Ref: #/components/schemas/TodoUpdate
 type TodoUpdate struct {
 	ID      OptInt32  `json:"id" bun:"id,pk,autoincrement"`

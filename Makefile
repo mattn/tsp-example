@@ -5,13 +5,13 @@ endif
 
 all: server$(EXT) client$(EXT)
 
-server$(EXT): cmd/server/main.go api
+server$(EXT): api/*.go  cmd/server/main.go
 	go build -o $@ cmd/server/main.go
 
-client$(EXT): cmd/client/main.go api
+client$(EXT):  api/*.go cmd/client/main.go
 	go build -o $@ cmd/client/main.go
 
-api: tsp-output/schema/openapi.yaml
+api/*.go: tsp-output/schema/openapi.yaml
 	ogen tsp-output/schema/openapi.yaml
 
 tsp-output/schema/openapi.yaml: main.tsp
