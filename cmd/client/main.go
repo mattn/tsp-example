@@ -29,7 +29,7 @@ func main() {
 			&cli.Command{
 				Name: "new",
 				Action: func(ctx context.Context, c *cli.Command) error {
-					if c.Args().Present() {
+					if !c.Args().Present() {
 						return errors.New("expected exactly an argument")
 					}
 					_, err := client.TodosCreate(ctx, &api.Todo{

@@ -71,6 +71,14 @@ func (s *Server) decodeTodosCreateRequest(r *http.Request) (
 			}
 			return req, close, err
 		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
+		}
 		return &request, close, nil
 	default:
 		return req, close, validate.InvalidContentType(ct)
@@ -133,6 +141,14 @@ func (s *Server) decodeTodosUpdateRequest(r *http.Request) (
 				Err:         err,
 			}
 			return req, close, err
+		}
+		if err := func() error {
+			if err := request.Validate(); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return req, close, errors.Wrap(err, "validate")
 		}
 		return &request, close, nil
 	default:

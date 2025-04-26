@@ -16,8 +16,8 @@ model Todo {
     id: int32;
 
     @doc("Content text")
-    //@minLength(1)
-    //@maxLength(32)
+    @minLength(1)
+    @maxLength(100)
     content: string;
 
     @doc("Represent done the todo")

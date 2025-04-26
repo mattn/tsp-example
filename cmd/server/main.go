@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"log"
 	"net/http"
 
@@ -40,8 +39,17 @@ func (h *TodoHandler) TodosCreate(ctx context.Context, req *api.Todo) (r *api.To
 //
 // DELETE /widgets/{id}
 func (h *TodoHandler) TodosDelete(ctx context.Context, params api.TodosDeleteParams) error {
-	_, err := h.bundb.NewDelete().Model((*api.Todo)(nil)).Where(`"id" = ?`, params.ID).Exec(ctx)
-	return err
+	result, err := h.bundb.NewDelete().Model((*api.Todo)(nil)).Where(`"id" = ?`, params.ID).Exec(ctx)
+	if err != nil {
+		return h.NewError(ctx, err)
+	}
+	if num, err := result.RowsAffected(); err != nil || num == 0 {
+		return &api.ErrorStatusCode{
+			StatusCode: http.StatusNotFound,
+			Response:   api.Error{Message: "No records deleted"},
+		}
+	}
+	return nil
 }
 
 // TodosList implements Todos_list operation.
@@ -53,7 +61,7 @@ func (h *TodoHandler) TodosList(ctx context.Context) (r *api.TodoList, _ error) 
 	var todoList api.TodoList
 	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Scan(ctx, &todoList.Items)
 	if err != nil {
-		return nil, err
+		return nil, h.NewError(ctx, err)
 	}
 	return &todoList, nil
 }
@@ -67,7 +75,7 @@ func (h *TodoHandler) TodosRead(ctx context.Context, params api.TodosReadParams)
 	var todo api.Todo
 	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Where("id = ?", params.ID).Scan(ctx, &todo)
 	if err != nil {
-		return nil, err
+		return nil, h.NewError(ctx, err)
 	}
 	return &todo, nil
 }
@@ -81,7 +89,10 @@ func (h *TodoHandler) TodosUpdate(ctx context.Context, req *api.TodoUpdate, para
 	var todo api.Todo
 	err := h.bundb.NewSelect().Model((*api.Todo)(nil)).Where("id = ?", params.ID).Scan(ctx, &todo)
 	if err != nil {
-		return nil, err
+		return nil, &api.ErrorStatusCode{
+			StatusCode: http.StatusNotFound,
+			Response:   api.Error{Message: "No records updated"},
+		}
 	}
 	if req.Content.IsSet() {
 		todo.SetContent(req.Content.Value)
@@ -91,10 +102,13 @@ func (h *TodoHandler) TodosUpdate(ctx context.Context, req *api.TodoUpdate, para
 	}
 	result, err := h.bundb.NewUpdate().Model(&todo).Where("id = ?", params.ID).Exec(context.Background())
 	if err != nil {
-		return nil, err
+		return nil, h.NewError(ctx, err)
 	}
 	if num, err := result.RowsAffected(); err != nil || num == 0 {
-		return nil, errors.New("No records updated")
+		return nil, &api.ErrorStatusCode{
+			StatusCode: http.StatusNotFound,
+			Response:   api.Error{Message: "No records updated"},
+		}
 	}
 	return &todo, nil
 }
@@ -103,8 +117,12 @@ func (h *TodoHandler) TodosUpdate(ctx context.Context, req *api.TodoUpdate, para
 //
 // Used for common default response.
 func (TodoHandler) NewError(ctx context.Context, err error) (r *api.ErrorStatusCode) {
-	r = new(api.ErrorStatusCode)
-	return r
+	return &api.ErrorStatusCode{
+		StatusCode: http.StatusInternalServerError,
+		Response: api.Error{
+			Message: err.Error(),
+		},
+	}
 }
 
 func main() {
