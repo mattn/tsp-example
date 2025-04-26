@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/fatih/color"
 	"github.com/mattn/tsp-example/api"
 	"github.com/urfave/cli/v3"
 )
@@ -62,7 +63,7 @@ func main() {
 			&cli.Command{
 				Name: "done",
 				Action: func(ctx context.Context, c *cli.Command) error {
-					if c.Args().Present() {
+					if !c.Args().Present() {
 						return errors.New("expected exactly an argument")
 					}
 					_, err = client.TodosUpdate(ctx, &api.TodoUpdate{
@@ -89,7 +90,11 @@ func main() {
 						return json.NewEncoder(os.Stdout).Encode(items.Items)
 					}
 					for _, item := range items.Items {
-						fmt.Println(item.GetID(), item.GetContent(), item.GetDone())
+						if item.GetDone() {
+							fmt.Fprintln(color.Output, item.GetID(), color.BlueString(item.GetContent()))
+						} else {
+							fmt.Fprintln(color.Output, item.GetID(), color.WhiteString(item.GetContent()))
+						}
 					}
 					return err
 				},
