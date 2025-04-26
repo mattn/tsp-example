@@ -6,10 +6,9 @@ package api
 type OperationName = string
 
 const (
-	TodosAnalyzeOperation OperationName = "TodosAnalyze"
-	TodosCreateOperation  OperationName = "TodosCreate"
-	TodosDeleteOperation  OperationName = "TodosDelete"
-	TodosListOperation    OperationName = "TodosList"
-	TodosReadOperation    OperationName = "TodosRead"
-	TodosUpdateOperation  OperationName = "TodosUpdate"
+	TodosCreateOperation OperationName = "TodosCreate"
+	TodosDeleteOperation OperationName = "TodosDelete"
+	TodosListOperation   OperationName = "TodosList"
+	TodosReadOperation   OperationName = "TodosRead"
+	TodosUpdateOperation OperationName = "TodosUpdate"
 )

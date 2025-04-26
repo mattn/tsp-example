@@ -79,15 +79,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				// Param: "id"
-				// Match until "/"
+				// Leaf parameter, slashes are prohibited
 				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
+				if idx >= 0 {
+					break
 				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
+				args[0] = elem
+				elem = ""
 
 				if len(elem) == 0 {
+					// Leaf node.
 					switch r.Method {
 					case "DELETE":
 						s.handleTodosDeleteRequest([1]string{
@@ -106,30 +107,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					return
-				}
-				switch elem[0] {
-				case '/': // Prefix: "/analyze"
-
-					if l := len("/analyze"); len(elem) >= l && elem[0:l] == "/analyze" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "POST":
-							s.handleTodosAnalyzeRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "POST")
-						}
-
-						return
-					}
-
 				}
 
 			}
@@ -254,15 +231,16 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				// Param: "id"
-				// Match until "/"
+				// Leaf parameter, slashes are prohibited
 				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
+				if idx >= 0 {
+					break
 				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
+				args[0] = elem
+				elem = ""
 
 				if len(elem) == 0 {
+					// Leaf node.
 					switch method {
 					case "DELETE":
 						r.name = TodosDeleteOperation
@@ -291,32 +269,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					default:
 						return
 					}
-				}
-				switch elem[0] {
-				case '/': // Prefix: "/analyze"
-
-					if l := len("/analyze"); len(elem) >= l && elem[0:l] == "/analyze" {
-						elem = elem[l:]
-					} else {
-						break
-					}
-
-					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "POST":
-							r.name = TodosAnalyzeOperation
-							r.summary = ""
-							r.operationID = "Todos_analyze"
-							r.pathPattern = "/todos/{id}/analyze"
-							r.args = args
-							r.count = 1
-							return r, true
-						default:
-							return
-						}
-					}
-
 				}
 
 			}

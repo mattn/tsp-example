@@ -8,12 +8,6 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// TodosAnalyze implements Todos_analyze operation.
-	//
-	// Analyze a Todo.
-	//
-	// POST /todos/{id}/analyze
-	TodosAnalyze(ctx context.Context, params TodosAnalyzeParams) (*AnalyzeResult, error)
 	// TodosCreate implements Todos_create operation.
 	//
 	// Create a Todo.

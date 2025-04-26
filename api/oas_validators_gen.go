@@ -20,7 +20,7 @@ func (s *Todo) Validate() error {
 		if err := (validate.String{
 			MinLength:    1,
 			MinLengthSet: true,
-			MaxLength:    10,
+			MaxLength:    32,
 			MaxLengthSet: true,
 			Email:        false,
 			Hostname:     false,
@@ -93,7 +93,7 @@ func (s *TodoUpdate) Validate() error {
 				if err := (validate.String{
 					MinLength:    1,
 					MinLengthSet: true,
-					MaxLength:    10,
+					MaxLength:    32,
 					MaxLengthSet: true,
 					Email:        false,
 					Hostname:     false,

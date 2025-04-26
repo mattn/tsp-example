@@ -13,15 +13,6 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// TodosAnalyze implements Todos_analyze operation.
-//
-// Analyze a Todo.
-//
-// POST /todos/{id}/analyze
-func (UnimplementedHandler) TodosAnalyze(ctx context.Context, params TodosAnalyzeParams) (r *AnalyzeResult, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // TodosCreate implements Todos_create operation.
 //
 // Create a Todo.

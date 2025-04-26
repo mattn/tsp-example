@@ -10,32 +10,6 @@ func (s *ErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
-// Ref: #/components/schemas/AnalyzeResult
-type AnalyzeResult struct {
-	ID       string `json:"id"`
-	Analysis string `json:"analysis"`
-}
-
-// GetID returns the value of ID.
-func (s *AnalyzeResult) GetID() string {
-	return s.ID
-}
-
-// GetAnalysis returns the value of Analysis.
-func (s *AnalyzeResult) GetAnalysis() string {
-	return s.Analysis
-}
-
-// SetID sets the value of ID.
-func (s *AnalyzeResult) SetID(val string) {
-	s.ID = val
-}
-
-// SetAnalysis sets the value of Analysis.
-func (s *AnalyzeResult) SetAnalysis(val string) {
-	s.Analysis = val
-}
-
 // Ref: #/components/schemas/Error
 type Error struct {
 	Code    int32  `json:"code"`
@@ -183,7 +157,9 @@ func (o OptString) Or(d string) string {
 // Represent a Todo item.
 // Ref: #/components/schemas/Todo
 type Todo struct {
-	ID      int32  `json:"id" bun:"id,pk,autoincrement"`
+	// ID of the item.
+	ID int32 `json:"id" bun:"id,pk,autoincrement"`
+	// Content text.
 	Content string `json:"content"`
 }
 
@@ -210,6 +186,7 @@ func (s *Todo) SetContent(val string) {
 // Represent a list of Todo items.
 // Ref: #/components/schemas/TodoList
 type TodoList struct {
+	// Todo items.
 	Items []Todo `json:"items"`
 }
 
@@ -226,7 +203,9 @@ func (s *TodoList) SetItems(val []Todo) {
 // Represent a Todo item.
 // Ref: #/components/schemas/TodoUpdate
 type TodoUpdate struct {
-	ID      OptInt32  `json:"id" bun:"id,pk,autoincrement"`
+	// ID of the item.
+	ID OptInt32 `json:"id" bun:"id,pk,autoincrement"`
+	// Content text.
 	Content OptString `json:"content"`
 }
 
